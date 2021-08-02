@@ -790,9 +790,53 @@ this.setState(
 )
 ```
 
-P79
+#### JSX语法原理
 
+JSX本质上是createElement()的语法糖，会被编译为createElement()方法。
 
+createElement()方法会转换为React元素，是一个js的对象。
+
+#### 组件更新机制
+
+注：setState()的作用：1. 修改state 2. 更新组件
+
+父组件更新时会重新渲染子组件，对兄弟组件无影响。
+
+#### 组件性能优化
+
+##### 减轻state
+
+state中只存储跟组件渲染相关的数据。
+
+不用做渲染的数据以及在多个方法中用到的数据应该放在this中。
+
+##### 避免不必要的重新渲染
+
+原因：父组件更新时会引起子组件的更新。
+
+解决方式：使用钩子函数shouldComponentUpdate(nextProps,nextState)，返回true表示重新渲染，false表示不重新渲染。钩子函数放在类组件内部，直接根据条件return。
+
+注：这个钩子函数在更新阶段，在组件重新渲染前执行。（shouldComponentUpdate->render）
+
+*两个参数表示最新的内容。*
+
+##### 纯组件
+
+纯组件内部的对比是浅层对比。
+
+值：直接比较值是否相等。
+
+引用类型：只比较对象的引用（地址）是否相同。
+
+注意：state或者props中属性值为引用类型时应该创建新数据，不要直接修改原数据。不要用数组的push/unshift等直接修改当前数组的方法，而应该用concat/slice等这些返回新数组的方法。或者如下：
+
+```jsx
+this.setState({
+    list: [...this.state.list,{新数据}]
+})
+```
+
+P87
 
 
 
