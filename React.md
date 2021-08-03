@@ -836,7 +836,110 @@ this.setState({
 })
 ```
 
-P87
+#### 虚拟DOM和Diff算法
+
+目的：部分更新，只更新变化的地方。
+
+虚拟DOM：本质上是一个JS对象，用于描述UI。
+
+执行过程：1. 初次渲染(render())，根据初始state和JSX结构创建一个虚拟DOM对象（树）。
+
+2. 根据虚拟DOM生成真正的DOM，渲染到页面中。
+3. 数据变化后重新根据新的数据创建新的虚拟DOM对象（树）。
+4. 与上一次得到的虚拟DOM对象使用Diff算法对比得到需要更新的内容。
+5. 将变化的内容更新到DOM中重新渲染到页面。
+
+虚拟DOM为react多平台的应用提供了保障。
+
+### React路由基础
+
+#### 基本使用
+
+1. 安装包：`yarn add react-router-dom`
+
+2. 导入路由核心组件：Router/Route/Link
+
+   `import { BrowserRouter as Router, Route, Link } from 'react-router-dom'`
+
+3. 使用Router组件包裹整个应用。
+
+4. 使用Link组件作为导航菜单（路由入口）
+
+   `<Link to="/first">页面一</Link>`
+
+5. 使用Route组件配置路由规则和要展示的组件（路由出口）。
+
+   `<Route path="/first" component={First}></Route>`
+
+**常用组件说明：**
+
+1. Router组件：包裹整个应用，一个React应用只使用一次。
+
+2. 两种常用的Router：HashRouter和BrowserRouter。
+
+3. HashRouter组件：使用URL的哈希值实现。（#）
+
+4. BrowserRouter组件：使用h5的history API实现。
+
+5. Link组件：用于指定导航链接（a标签）。
+
+   to属性：浏览器地址栏的pathname
+
+6. Route组件：指定路由展示组件相关信息。
+
+   path属性：路由规则
+
+   component属性：展示的组件
+
+#### 路由执行过程
+
+1. 点击Link组件（a标签），修改浏览器地址栏中的url。
+2. React路由监听到地址栏url的变化。
+3. React路由内部遍历所有Route组件，使用路由规则（path）与pathname进行匹配。
+4. 当路由规则（path）能够匹配地址栏中的pathname时展示Route组件的内容。
+
+#### 编程式导航
+
+通过js代码实现页面跳转。
+
+`this.props.history.push('/home')`
+
+注：1. history是React路由提供的，用于获取浏览器历史记录的相关信息。
+
+2. push(path)：跳转到某个页面，参数path表示要跳转的路径。
+3. go(n)：前进或者后退到某个页面，参数n表示前进或者后退页面的数量。（-1表示上一个页面）
+
+#### 默认路由
+
+表示进入页面时就会匹配的路由。
+
+默认路由path为：/
+
+`<Route path="/" component={Home} >`
+
+#### 匹配模式
+
+##### 模糊匹配模式
+
+默认情况下React路由是模糊匹配模式。
+
+规则：只要pathname（Link组件中to属性的值）以path（Route组件中path属性的值）开头就会匹配成功。
+
+##### 精确匹配
+
+给Route组件添加exact属性就可以变为精确匹配模式。
+
+`<Route exact path="/" component=... />`
+
+规则：只有当path和pathname完全匹配时才会展示该路由。
+
+# React基础部分结束！
+
+
+
+
+
+
 
 
 
