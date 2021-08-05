@@ -412,3 +412,268 @@ npx可以自动搜索本地安装的命令并且运行。
 
 npx还可以直接运行github上gist的代码。
 
+### 事件循环
+
+#### 调用堆栈
+
+事件循环会不断检查调用堆栈，查看是否有要运行的函数。
+
+#### 消息队列
+
+在消息队列中，用户触发的事件（如单击或键盘事件、或获取响应）也会在此排队，然后代码才有机会对其作出反应。 
+
+事件循环会赋予调用堆栈优先级，它首先处理在调用堆栈中找到的所有东西，一旦其中没有任何东西，便开始处理消息队列中的东西。
+
+#### 作业队列
+
+这种方式会尽快地执行异步函数的结果，而不是放在调用堆栈的末尾。在当前函数结束之前 resolve 的 Promise 会在当前函数之后被立即执行。
+
+### process.nextTick()
+
+一次完整的事件循环即为一个tick。
+
+在下一个tick开始前调用函数：
+
+```js
+process.nextTick(() => {
+    //下一个tick前干的事情
+})
+```
+
+这种方式相当于插队执行函数。
+
+### setImmediate()
+
+在下一个tick中调用函数：
+
+```js
+setImmediate(() => {
+  //运行一些东西
+})
+```
+
+### JS定时器
+
+#### setTimeout()
+
+提供回调函数以及延迟运行的时间：
+
+```javascript
+setTimeout(() => {
+  // 2 秒之后运行
+}, 2000)
+
+setTimeout(() => {
+  // 50 毫秒之后运行
+}, 50)
+```
+
+也可以传入其他参数：
+
+```javascript
+const myFunction = (firstParam, secondParam) => {
+  // 做些事情
+}
+
+// 2 秒之后运行
+setTimeout(myFunction, 2000, firstParam, secondParam)
+```
+
+setTimeout()会返回定时器的id，可以用于清除该定时器。
+
+#### 零延迟
+
+将延迟时间设为0，回调函数会尽快执行，但是在当前函数执行之后。
+
+#### setInterval()
+
+会在指定的特定时间间隔（以毫秒为单位）一直地运行回调函数，而不是只运行一次。
+
+```javascript
+setInterval(() => {
+  // 每 2 秒运行一次
+}, 2000)
+```
+
+需要用clearInterval(id)来停止循环，所以会放在定时器内部：
+
+```javascript
+const interval = setInterval(() => {
+  if (App.somethingIWait === 'arrived') {
+    clearInterval(interval)
+    return
+  }
+  // 否则做些事情
+}, 100)
+```
+
+#### 递归的setTimeout()
+
+setInterval()每n毫秒启动一次函数，但不会考虑函数执行的时间，因此若函数执行时间不一会导致重叠执行等等问题。以下方案可以使函数均匀执行：
+
+```javascript
+const myFunction = () => {
+  // 做些事情
+
+  setTimeout(myFunction, 1000)
+}
+
+setTimeout(myFunction, 1000)
+```
+
+### 异步编程与回调
+
+程序是异步的且会暂停执行直到需要关注，这使得计算机可以同时执行其他操作。 当程序正在等待来自网络的响应时，则它无法在请求完成之前停止处理器。JS默认情况下是同步、单线程的。
+
+以按钮为例，在写代码的时候不知道这个按钮什么时候会被触发，因此用一个回调函数来存放触发时要执行的函数。
+
+#### 处理回调的错误
+
+任何回调函数中的第一个参数为错误对象（即错误优先的回调）。
+
+```javascript
+fs.readFile('/文件.json', (err, data) => {
+  if (err !== null) {
+    //处理错误
+    console.log(err)
+    return
+  }
+
+  //没有错误，则处理数据。
+  console.log(data)
+})
+```
+
+#### 复杂回调
+
+使用Promise/Async/Await。
+
+### Promise
+
+最终会变为可用值的代理，可用于处理异步代码。
+
+#### 创建Promise
+
+```javascript
+let done = true
+
+const isItDoneYet = new Promise((resolve, reject) => {
+  if (done) {
+    const workDone = '这是创建的东西'
+    resolve(workDone)
+  } else {
+    const why = '仍然在处理其他事情'
+    reject(why)
+  }
+})
+```
+
+#### 消费Promise
+
+```javascript
+const isItDoneYet = new Promise(/* ... 如上所述 ... */)
+//...
+
+const checkIfItsDone = () => {
+  isItDoneYet
+    .then(ok => {
+      console.log(ok)
+    })
+    .catch(err => {
+      console.error(err)
+    })
+}
+```
+
+#### 错误处理
+
+发生错误时会执行最近的catch()语句。
+
+#### 级联错误
+
+catch()内部的错误也可以由下一个catch()处理。
+
+#### 编排Promise
+
+Promise.all()可以用于定义Promise列表并且在所有Promise解决后执行操作。
+
+```javascript
+const f1 = fetch('/something.json')
+const f2 = fetch('/something2.json')
+
+Promise.all([f1, f2])
+  .then(res => {
+    console.log('结果的数组', res)
+  })
+  .catch(err => {
+    console.error(err)
+  })
+```
+
+Promise.race()可以在第一个传入的Promise解决后执行。
+
+```javascript
+const first = new Promise((resolve, reject) => {
+  setTimeout(resolve, 500, '第一个')
+})
+const second = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, '第二个')
+})
+
+Promise.race([first, second]).then(result => {
+  console.log(result) // 第二个
+})
+```
+
+#### 错误
+
+Uncaught TypeError: undefined is not a promise
+
+使用 `new Promise()` 而不是 `Promise()`。
+
+UnhandledPromiseRejectionWarning
+
+在 `then` 之后添加 `catch` 。
+
+### Async/Await
+
+在任何函数之前加上 `async` 关键字意味着该函数会返回 promise。
+
+只需要在耗时操作前面await即可实现Promise的.then的功能，会使代码看起来非常简洁并且使调试变得非常简单。
+
+### 事件触发器
+
+NodeJS提供events模块用于触发事件，此模块提供了EventEmitter类。
+
+初始化：
+
+```javascript
+const EventEmitter = require('events')
+const eventEmitter = new EventEmitter()
+```
+
+- `emit` 用于触发事件。
+- `on` 用于添加回调函数（会在事件被触发时执行）。
+
+```javascript
+eventEmitter.on('start', () => {
+  console.log('开始')
+})
+```
+
+当运行以下代码时：
+
+```javascript
+eventEmitter.emit('start')
+```
+
+事件处理函数会被触发，且获得控制台日志。
+
+也可以加入额外的参数。
+
+- `once()`: 添加单次监听器。
+- `removeListener()` / `off()`: 从事件中移除事件监听器。
+- `removeAllListeners()`: 移除事件的所有监听器。
+
+### HTTP服务器
+
