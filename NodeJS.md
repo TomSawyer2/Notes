@@ -677,3 +677,313 @@ eventEmitter.emit('start')
 
 ### HTTP服务器
 
+示例：
+
+```javascript
+const http = require('http')
+
+const port = 3000
+
+const server = http.createServer((req, res) => {
+  res.statusCode = 200
+  res.setHeader('Content-Type', 'text/plain')
+  res.end('你好世界\n')
+})
+
+server.listen(port, () => {
+  console.log(`服务器运行在 http://${hostname}:${port}/`)
+})
+```
+
+### 发送HTTP请求
+
+#### GET
+
+```javascript
+const https = require('https')
+const options = {
+  hostname: 'nodejs.cn',
+  port: 443,
+  path: '/todos',
+  method: 'GET'
+}
+
+const req = https.request(options, res => {
+  console.log(`状态码: ${res.statusCode}`)
+
+  res.on('data', d => {
+    process.stdout.write(d)
+  })
+})
+
+req.on('error', error => {
+  console.error(error)
+})
+
+req.end()
+```
+
+#### POST
+
+标准模块
+
+```javascript
+const https = require('https')
+
+const data = JSON.stringify({
+  todo: '做点事情'
+})
+
+const options = {
+  hostname: 'nodejs.cn',
+  port: 443,
+  path: '/todos',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Content-Length': data.length
+  }
+}
+
+const req = https.request(options, res => {
+  console.log(`状态码: ${res.statusCode}`)
+
+  res.on('data', d => {
+    process.stdout.write(d)
+  })
+})
+
+req.on('error', error => {
+  console.error(error)
+})
+
+req.write(data)
+req.end()
+```
+
+axios
+
+```javascript
+const axios = require('axios')
+
+axios
+  .post('http://nodejs.cn/todos', {
+    todo: '做点事情'
+  })
+  .then(res => {
+    console.log(`状态码: ${res.statusCode}`)
+    console.log(res)
+  })
+  .catch(error => {
+    console.error(error)
+  })
+```
+
+#### PUT/DELETE
+
+与POST类似，只需更改请求方式。
+
+### 获取请求正文数据
+
+express
+
+```javascript
+const express = require('express')
+const app = express()
+
+app.use(
+  express.urlencoded({
+    extended: true
+  })
+)
+
+app.use(express.json())
+
+app.post('/todos', (req, res) => {
+  console.log(req.body.todo)
+})
+```
+
+标准模块
+
+```javascript
+const server = http.createServer((req, res) => {
+  let data = '';
+  req.on('data', chunk => {
+    data += chunk;
+  })
+  req.on('end', () => {
+    JSON.parse(data).todo // '做点事情'
+  })
+})
+```
+
+### 使用文件描述符
+
+文件描述符是使用 `fs` 模块提供的 `open()` 方法打开文件后返回的：
+
+```javascript
+const fs = require('fs')
+
+fs.open('/Users/joe/test.txt', 'r', (err, fd) => {
+  //fd 是文件描述符。
+})
+```
+
+- `r+` 打开文件用于读写。
+- `w+` 打开文件用于读写，将流定位到文件的开头。如果文件不存在则创建文件。
+- `a` 打开文件用于写入，将流定位到文件的末尾。如果文件不存在则创建文件。
+- `a+` 打开文件用于读写，将流定位到文件的末尾。如果文件不存在则创建文件。
+
+`fs.openSync`方法可以用于打开文件并直接返回文件描述符。
+
+### 文件属性
+
+- 使用 `stats.isFile()` 和 `stats.isDirectory()` 判断文件是否目录或文件。
+- 使用 `stats.isSymbolicLink()` 判断文件是否符号链接。
+- 使用 `stats.size` 获取文件的大小（以字节为单位）。
+
+### 文件路径
+
+Linux、MacOS以及Win的文件路径表述方式不同，因此需要进行区分。
+
+```javascript
+const path = require('path')
+```
+
+- `dirname`: 获取文件的父文件夹。
+- `basename`: 获取文件名部分。
+- `extname`: 获取文件的扩展名。
+
+示例：
+
+```javascript
+const notes = '/users/joe/notes.txt'
+
+path.dirname(notes) // /users/joe
+path.basename(notes) // notes.txt
+path.extname(notes) // .txt
+```
+
+通过为 `basename` 指定第二个参数来获取不带扩展名的文件名：
+
+```javascript
+path.basename(notes, path.extname(notes)) //notes
+```
+
+使用 `path.join()` 连接路径的两个或多个片段：
+
+```javascript
+const name = 'joe'
+path.join('/', 'users', name, 'notes.txt') //'/users/joe/notes.txt'
+```
+
+使用 `path.resolve()` 获得相对路径的绝对路径计算：
+
+```javascript
+path.resolve('joe.txt') //'/Users/joe/joe.txt' 如果从主文件夹运行。
+```
+
+将 `/joe.txt` 附加到当前工作目录。 如果指定第二个文件夹参数，则 `resolve` 会使用第一个作为第二个的基础：
+
+```javascript
+path.resolve('tmp', 'joe.txt') //'/Users/joe/tmp/joe.txt' 如果从主文件夹运行。
+```
+
+如果第一个参数以斜杠开头，则表示它是绝对路径：
+
+```javascript
+path.resolve('/etc', 'joe.txt') //'/etc/joe.txt'
+```
+
+`path.normalize()`可用于计算相对路径的绝对路径。
+
+### 读取文件
+
+fs.readFile()
+
+```javascript
+const fs = require('fs')
+
+fs.readFile('/Users/joe/test.txt', 'utf8' , (err, data) => {
+  if (err) {
+    console.error(err)
+    return
+  }
+  console.log(data)
+})
+```
+
+fs.readFileSync()
+
+```javascript
+const fs = require('fs')
+
+try {
+  const data = fs.readFileSync('/Users/joe/test.txt', 'utf8')
+  console.log(data)
+} catch (err) {
+  console.error(err)
+}
+```
+
+### 写入文件
+
+fs.writeFile()
+
+```javascript
+const fs = require('fs')
+
+const content = '一些内容'
+
+fs.writeFile('/Users/joe/test.txt', content, err => {
+  if (err) {
+    console.error(err)
+    return
+  }
+  //文件写入成功。
+})
+```
+
+fs.writeFileSync()
+
+```javascript
+const fs = require('fs')
+
+const content = '一些内容'
+
+try {
+  const data = fs.writeFileSync('/Users/joe/test.txt', content, { flag: 'a+' })
+  //文件写入成功。
+} catch (err) {
+  console.error(err)
+}
+```
+
+注意：这两种方式写入文件会替换文件的内容。
+
+- `r+` 打开文件用于读写。
+- `w+` 打开文件用于读写，将流定位到文件的开头。如果文件不存在则创建文件。
+- `a` 打开文件用于写入，将流定位到文件的末尾。如果文件不存在则创建文件。
+- `a+` 打开文件用于读写，将流定位到文件的末尾。如果文件不存在则创建文件。
+
+fs.appendFile()
+
+fs.appendFileSync()
+
+```javascript
+const content = '一些内容'
+
+fs.appendFile('file.log', content, err => {
+  if (err) {
+    console.error(err)
+    return
+  }
+  //完成！
+})
+```
+
+注意：这两种方式是追加内容。
+
+### 使用文件夹
+
