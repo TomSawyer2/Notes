@@ -987,3 +987,232 @@ fs.appendFile('file.log', content, err => {
 
 ### 使用文件夹
 
+`fs.access()` 检查文件夹是否存在以及 Node.js 是否具有访问权限。
+
+ `fs.mkdir()` 或 `fs.mkdirSync()` 创建文件夹。
+
+ `fs.readdir()` 或 `fs.readdirSync()` 读取目录的内容并返回所有文件、子文件夹的相对路径。
+
+#### 重命名文件夹
+
+使用 `fs.rename()` 或 `fs.renameSync()` 。 第一个参数是当前的路径，第二个参数是新的路径。
+
+#### 删除文件夹
+
+使用 `fs.rmdir()` 或 `fs.rmdirSync()` 。
+
+若文件夹有内容，则需要：
+
+1. 安装：`npm install fs-extra`
+
+2. ```javascript
+   fs.remove(folder)
+     .then(() => {
+       //完成
+     })
+     .catch(err => {
+       console.error(err)
+     })
+   ```
+
+### 文件系统模块
+
+fs的所有方法默认是异步的，但加上Sync也可以变为同步的。
+
+### 路径模块
+
+`path.basename()`返回路径的最后一部分。第二个参数可以过滤拓展名。
+
+`path.dirname()`返回路径的目录。
+
+`path.extname()`返回路径的拓展名。
+
+`path.isAbsolute()`判断是否为绝对路径。
+
+`path.join()`连接路径的多个部分。
+
+`path.normalize()`计算绝对路径。
+
+`path.parse()`解析路径为片段。
+
+`path.relative()`接收两个参数，计算从第一个路径到第二个路径的相对路径。
+
+`path.resolve()`通过相对路径获取绝对路径，指定第二个参数，`resolve` 会使用第一个参数作为第二个参数的基准，如果第一个参数以斜杠开头，则表示它是绝对路径。
+
+### 系统模块
+
+`os.arch()`系统底层架构。
+
+`os.cpus()`系统可用CPU信息。
+
+`os.endianness()`判断是使用大端序编译NodeJS还是小端序。
+
+`os.freemen()`可用内存字节数。
+
+`os.homedir()`主目录路径。
+
+`os.hostname()`主机名。
+
+`os.loadavg()`操作系统对平均负载的计算。
+
+`os.networkInterfaces()`系统上可用网络接口的信息。
+
+`os.platform()`编译NodeJS的平台。
+
+`os.release()`操作系统版本号。
+
+`os.tmpdir()`指定临时文件夹的路径。
+
+`os.totalmem()`系统可用总内存。
+
+`os.type()`操作系统标识。
+
+`os.uptime()`计算机运行秒数。
+
+`os.userInfo()`返回有关user的对象。
+
+### 事件模块
+
+`emitter.emit()`按照事件被注册的顺序同步地调用每个事件监听器。
+
+`emitter.eventNames()`返回字符串（表示在当前 EventEmitter 对象上注册的事件）数组。
+
+`emitter.getMaxListeners()`获取可以添加到 EventEmitter 对象的监听器的最大数量。
+
+`emitter.listenerCount()`获取作为参数传入的事件监听器的计数。
+
+`emitter.listeners()`获取作为参数传入的事件监听器的数组。
+
+`emitter.off()`emitter.removeListener() 的别名。
+
+`emitter.on()`添加当事件被触发时调用的回调函数。
+
+`emitter.once()`添加当事件在注册之后首次被触发时调用的回调函数。
+
+`emitter.prependListener()`当使用 on 或 addListener 添加监听器时，监听器会被添加到监听器队列中的最后一个，并且最后一个被调用。 使用 prependListener 则可以在其他监听器之前添加并调用。
+
+`emitter.prependOnceListener()`当使用 once 添加监听器时，监听器会被添加到监听器队列中的最后一个，并且最后一个被调用。 使用 prependOnceListener 则可以在其他监听器之前添加并调用。
+
+`emitter.removeAllListeners()`移除 EventEmitter 对象的所有监听特定事件的监听器。
+
+`emitter.removeListener()`移除特定的监听器。 可以通过将回调函数保存到变量中（当添加时），以便以后可以引用它。
+
+`emitter.setMaxListeners()`设置可以添加到 `EventEmitter` 对象的监听器的最大数量。
+
+### HTTP模块
+
+没啥好记的。
+
+### Buffer
+
+Buffer本质是整数数组，每个整数代表一个数据字节。
+
+Buffer 与流紧密相连。 当流处理器接收数据的速度快于其消化的速度时，则会将数据放入 buffer 中。
+
+### 流
+
+在传统的方式中，当告诉程序读取文件时，这会将文件从头到尾读入内存，然后进行处理。
+
+使用流，则可以逐个片段地读取并处理（而无需全部保存在内存中）。
+
+`pipe()` 方法的返回值是目标流，这是非常方便的事情，它使得可以链接多个 `pipe()` 调用。
+
+- `process.stdin` 返回连接到 stdin 的流。
+- `process.stdout` 返回连接到 stdout 的流。
+- `process.stderr` 返回连接到 stderr 的流。
+- `fs.createReadStream()` 创建文件的可读流。
+- `fs.createWriteStream()` 创建到文件的可写流。
+- `net.connect()` 启动基于流的连接。
+- `http.request()` 返回 http.ClientRequest 类的实例，该实例是可写流。
+- `zlib.createGzip()` 使用 gzip（压缩算法）将数据压缩到流中。
+- `zlib.createGunzip()` 解压缩 gzip 流。
+- `zlib.createDeflate()` 使用 deflate（压缩算法）将数据压缩到流中。
+- `zlib.createInflate()` 解压缩 deflate 流。
+
+#### 流的类型
+
+- `Readable`: 可以通过管道读取、但不能通过管道写入的流（可以接收数据，但不能向其发送数据）。 当推送数据到可读流中时，会对其进行缓冲，直到使用者开始读取数据为止。
+- `Writable`: 可以通过管道写入、但不能通过管道读取的流（可以发送数据，但不能从中接收数据）。
+- `Duplex`: 可以通过管道写入和读取的流，基本上相对于是可读流和可写流的组合。
+- `Transform`: 类似于双工流、但其输出是其输入的转换的转换流。
+
+### 开发环境和生产环境
+
+生产环境：
+
+- 日志记录保持在最低水平。
+- 更高的缓存级别以优化性能。
+
+可以使用条件语句在不同的环境中执行代码：
+
+```javascript
+if (process.env.NODE_ENV === "development") {
+  //...
+}
+if (process.env.NODE_ENV === "production") {
+  //...
+}
+if(['production', 'staging'].indexOf(process.env.NODE_ENV) >= 0) {
+  //...
+})
+```
+
+### 错误处理
+
+使用 `throw` 关键字创建异常：
+
+```javascript
+throw value
+```
+
+常规的程序流会被停止，且控制会被交给最近的异常处理程序。
+
+错误对象是 Error 对象的实例：
+
+```javascript
+throw new Error('错误信息')
+```
+
+异常处理程序是 `try`/`catch` 语句。
+
+`try` 块中包含的代码行中引发的任何异常都会在相应的 `catch` 块中处理：
+
+```javascript
+try {
+  //代码行
+} catch (e) {}
+```
+
+在此示例中，`e` 是异常值。
+
+监听 `process` 对象上的 `uncaughtException` 事件以处理未捕获的异常。
+
+### 记录对象
+
+防止因为嵌套过多NodeJS直接返回一个[Object]，有以下两种方式：
+
+```javascript
+console.log(JSON.stringify(obj, null, 2))
+```
+
+其中 `2` 是用于缩进的空格数。
+
+```javascript
+require('util').inspect.defaultOptions.depth = null
+console.log(obj)
+```
+
+但第 2 级之后的嵌套对象会被展平。
+
+### TS
+
+梦回C。
+
+运行：
+
+1. `npm install typescript`
+2. `tsc test.ts`
+3. 运行生成的js文件。
+
+# NodeJS基础部分学习结束
+
