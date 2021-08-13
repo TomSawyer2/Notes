@@ -246,3 +246,372 @@ db.collection.find(query, projection)
 
 ### 条件操作符
 
+- (>) 大于 - $gt
+- (<) 小于 - $lt
+- (>=) 大于等于 - $gte
+- (<= ) 小于等于 - $lte
+
+`db.xxx.find({likes : {$gt : 100}})`likes大于100的文档。
+
+`db.col.find({likes : {$lt :200, $gt : 100}})`likes大于100小于200的文档。
+
+### $type操作符
+
+用于匹配固定的数据类型。
+
+| **类型**                | **数字** | **备注**         |
+| :---------------------- | :------- | :--------------- |
+| Double                  | 1        |                  |
+| String                  | 2        |                  |
+| Object                  | 3        |                  |
+| Array                   | 4        |                  |
+| Binary data             | 5        |                  |
+| Undefined               | 6        | 已废弃。         |
+| Object id               | 7        |                  |
+| Boolean                 | 8        |                  |
+| Date                    | 9        |                  |
+| Null                    | 10       |                  |
+| Regular Expression      | 11       |                  |
+| JavaScript              | 13       |                  |
+| Symbol                  | 14       |                  |
+| JavaScript (with scope) | 15       |                  |
+| 32-bit integer          | 16       |                  |
+| Timestamp               | 17       |                  |
+| 64-bit integer          | 18       |                  |
+| Min key                 | 255      | Query with `-1`. |
+| Max key                 | 127      |                  |
+
+可以用类型名或者数字进行匹配。
+
+```
+db.col.find({"title" : {$type : 2}})
+db.col.find({"title" : {$type : 'string'}})
+```
+
+### Limit()
+
+可以指定读取的文档数量。
+
+`db.xxx.find(...).limit(2)`只搜索两项。
+
+### Skip()
+
+可以指定跳过文档的数量。
+
+`db.xxx.find(...).skip(1)`跳过搜索第一项。
+
+### 排序
+
+`db.xxx.find(...).sort({KEY:1})`升序
+
+`db.xxx.find(...).sort({KEY:-1})`降序
+
+### 索引
+
+创建索引：`db.xxx.createIndex(keys, options)`
+
+Key 值为要创建的索引字段，1升序-1降序，可以有多个索引字段。
+
+```
+db.col.createIndex({"title":1})
+```
+
+### 聚合
+
+用于处理数据。
+
+#### aggregate()
+
+`db.xxx.aggregate(options)`
+
+示例：`db.xxx.aggregate([{$group : {_id : "$by_user", num_tutorial : {$sum : 1}}}])`
+
+| 表达式    | 描述                                           | 实例                                                         |
+| :-------- | :--------------------------------------------- | :----------------------------------------------------------- |
+| $sum      | 计算总和。                                     | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$sum : "$likes"}}}]) |
+| $avg      | 计算平均值                                     | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$avg : "$likes"}}}]) |
+| $min      | 获取集合中所有文档对应值得最小值。             | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$min : "$likes"}}}]) |
+| $max      | 获取集合中所有文档对应值得最大值。             | db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$max : "$likes"}}}]) |
+| $push     | 在结果文档中插入值到一个数组中。               | db.mycol.aggregate([{$group : {_id : "$by_user", url : {$push: "$url"}}}]) |
+| $addToSet | 在结果文档中插入值到一个数组中，但不创建副本。 | db.mycol.aggregate([{$group : {_id : "$by_user", url : {$addToSet : "$url"}}}]) |
+| $first    | 根据资源文档的排序获取第一个文档数据。         | db.mycol.aggregate([{$group : {_id : "$by_user", first_url : {$first : "$url"}}}]) |
+| $last     | 根据资源文档的排序获取最后一个文档数据         | db.mycol.aggregate([{$group : {_id : "$by_user", last_url : {$last : "$url"}}}]) |
+
+#### 管道
+
+将当前命令的输出作为下一个命令的参数。
+
+- $project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+- $match：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。
+- $limit：用来限制MongoDB聚合管道返回的文档数。
+- $skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+- $unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+- $group：将集合中的文档分组，可用于统计结果。
+- $sort：将输入文档排序后输出。
+- $geoNear：输出接近某一地理位置的有序文档。
+
+```
+db.articles.aggregate( [
+                        { $match : { score : { $gt : 70, $lte : 90 } } },
+                        { $group: { _id: null, count: { $sum: 1 } } }
+                       ] );
+```
+
+$match用于获取分数大于70小于或等于90记录，然后将符合条件的记录送到下一阶段$group管道操作符进行处理。
+
+### 复制
+
+启动实例：
+
+```
+mongod --port "PORT" --dbpath "YOUR_DB_DATA_PATH" --replSet "REPLICA_SET_INSTANCE_NAME"
+```
+
+启动副本集：`rs.initiate()`
+
+添加副本集成员：`rs.add(HOST_NAME:PORT)`
+
+判断是否为主节点：`db.isMaster()`
+
+主从关系在主机宕机后所有服务停止，但副本集中副本会接管主节点称为主节点。
+
+### 分片
+
+将大量数据分别储存在多台机器上。
+
+1. 启动Shard Server。
+2. 启动Config Server。
+3. 启动Route Process。
+4. 配置Sharding。
+5. 正常连接数据库。
+
+### 备份与恢复
+
+#### 备份
+
+```
+mongodump -h dbhost -d dbname -o dbdirectory
+```
+
+- -h：
+
+  MongoDB 所在服务器地址。
+
+- -d：
+
+  需要备份的数据库实例，例如：test
+
+- -o：
+
+  备份的数据存放位置，例如：c:\data\dump，当然该目录需要提前建立，在备份完成后，系统自动在dump目录下建立一个test目录，这个目录里面存放该数据库实例的备份数据。
+
+#### 恢复
+
+```
+mongorestore -h <hostname><:port> -d dbname <path>
+```
+
+- --host <:port>, -h <:port>：
+
+  MongoDB所在服务器地址，默认为： localhost:27017
+
+- --db , -d ：
+
+  需要恢复的数据库实例，例如：test，当然这个名称也可以和备份时候的不一样，比如test2
+
+- --drop：
+
+  恢复的时候，先删除当前数据，然后恢复备份的数据。
+
+- <path>：
+
+  设置备份数据所在位置，例如：c:\data\dump\test。
+
+  不能同时指定 <path> 和 --dir 选项。
+
+- --dir：
+
+  指定备份的目录。
+
+### 监控
+
+`mongostat`定时输出MongoDB的运行状态。
+
+`mongotop`跟踪MongoDB实例，提供每个集合水平的统计数据。
+
+### NodeJS使用MongoDB
+
+安装：`npm install mongodb`
+
+#### 创建数据库
+
+```js
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/runoob";
+ 
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  console.log("数据库已创建!");
+  db.close();
+});
+```
+
+#### 创建集合
+
+```js
+var MongoClient = require('mongodb').MongoClient;
+var url = 'mongodb://localhost:27017/runoob';
+MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    console.log('数据库已创建');
+    var dbase = db.db("runoob");
+    dbase.createCollection('site', function (err, res) {
+        if (err) throw err;
+        console.log("创建集合!");
+        db.close();
+    });
+});
+```
+
+#### 插入数据
+
+```js
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+ 
+MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("runoob");
+    var myobj = { name: "菜鸟教程", url: "www.runoob" };
+    dbo.collection("site").insertOne(myobj, function(err, res) {
+        if (err) throw err;
+        console.log("文档插入成功");
+        db.close();
+    });
+});
+```
+
+#### 查询数据
+
+```js
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+ 
+MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("runoob");
+    dbo.collection("site"). find({}).toArray(function(err, result) { // 返回集合中所有数据
+        if (err) throw err;
+        console.log(result);
+        db.close();
+    });
+});
+```
+
+#### 更新数据
+
+```js
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+ 
+MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("runoob");
+    var whereStr = {"name":'菜鸟教程'};  // 查询条件
+    var updateStr = {$set: { "url" : "https://www.runoob.com" }};
+    dbo.collection("site").updateOne(whereStr, updateStr, function(err, res) {
+        if (err) throw err;
+        console.log("文档更新成功");
+        db.close();
+    });
+});
+```
+
+#### 删除数据
+
+```js
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+ 
+MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("runoob");
+    var whereStr = {"name":'菜鸟教程'};  // 查询条件
+    dbo.collection("site").deleteOne(whereStr, function(err, obj) {
+        if (err) throw err;
+        console.log("文档删除成功");
+        db.close();
+    });
+});
+```
+
+#### 排序
+
+```js
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+ 
+MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("runoob");
+    var mysort = { type: 1 };
+    dbo.collection("site").find().sort(mysort).toArray(function(err, result) {
+        if (err) throw err;
+        console.log(result);
+        db.close();
+    });
+});
+```
+
+#### 查询分页
+
+limit()和skip()配合使用。
+
+#### 连接
+
+使用$lookup实现左连接。
+
+#### 删除集合
+
+`drop()`
+
+#### 使用异步函数同时进行多个操作
+
+```js
+const MongoClient = require("mongodb").MongoClient;
+const url = "mongodb://localhost/";
+ 
+async function dataOperate() {
+    var conn = null;
+    try {
+        conn = await MongoClient.connect(url);
+        console.log("数据库已连接");
+        const test = conn.db("testdb").collection("test");
+        // 增加
+        await test.insertOne({ "site": "runoob.com" });
+        // 查询
+        var arr = await test.find().toArray();
+        console.log(arr);
+        // 更改
+        await test.updateMany({ "site": "runoob.com" },
+            { $set: { "site": "example.com" } });
+        // 查询
+        arr = await test.find().toArray();
+        console.log(arr);
+        // 删除
+        await test.deleteMany({ "site": "example.com" });
+        // 查询
+        arr = await test.find().toArray();
+        console.log(arr);
+    } catch (err) {
+        console.log("错误：" + err.message);
+    } finally {
+        if (conn != null) conn.close();
+    }
+}
+ 
+dataOperate();
+```
+
+### 关系
+
