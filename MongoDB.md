@@ -615,3 +615,314 @@ dataOperate();
 
 ### 关系
 
+表示多个文档之间在逻辑上的相互联系。
+
+文档间可以通过嵌入和引用来建立联系。
+
+#### 嵌入式关系
+
+在一个文档内部以数组形式嵌入多个文档。
+
+#### 引用式关系
+
+把用户数据文档和用户地址数据文档分开，通过引用文档的 **id** 字段来建立关系。
+
+### 数据库引用
+
+#### DBRefs
+
+```
+{ $ref : , $id : , $db :  }
+```
+
+- $ref：集合名称
+- $id：引用的id
+- $db:数据库名称，可选参数
+
+#### 手动引用
+
+手动引用。
+
+### 覆盖索引查询
+
+- 所有的查询字段是索引的一部分
+- 所有的查询返回字段在同一个索引中
+
+指定find的第二个参数后，查询时不会在数据库文件中查找而是从索引中提取数据。
+
+所有索引字段是一个数组或一个子文档时不能用覆盖索引查询。
+
+### 查询分析
+
+#### explain()
+
+在查询语句末尾加上`.explain()`
+
+#### hint()
+
+可以使用 hint 来强制 MongoDB 使用一个指定的索引。
+
+### 原子操作
+
+#### $set
+
+用来指定一个键并更新键值，若键不存在并创建。
+
+```
+{ $set : { field : value } }
+```
+
+#### $unset
+
+用来删除一个键。
+
+```
+{ $unset : { field : 1} }
+```
+
+#### $inc
+
+$inc可以对文档的某个值为数字型（只能为满足要求的数字）的键进行增减的操作。
+
+```
+{ $inc : { field : value } }
+```
+
+#### $push
+
+把value追加到field里面去，field一定要是数组类型才行，如果field不存在，会新增一个数组类型加进去。
+
+```
+{ $push : { field : value } }
+```
+
+#### $pushAll
+
+同$push,只是一次可以追加多个值到一个数组字段内。
+
+```
+{ $pushAll : { field : value_array } }
+```
+
+#### $pull
+
+从数组field内删除一个等于value值。
+
+```
+{ $pull : { field : _value } }
+```
+
+#### $addToSet
+
+增加一个值到数组内，而且只有当这个值不在数组内才增加。
+
+#### $pop
+
+删除数组的第一个或最后一个元素
+
+```
+{ $pop : { field : 1 } }
+```
+
+#### $rename
+
+修改字段名称
+
+```
+{ $rename : { old_field_name : new_field_name } }
+```
+
+#### $bit
+
+位操作，integer类型
+
+```
+{$bit : { field : {and : 5}}}
+```
+
+### 高级索引
+
+可以对文档的子文档建立索引。
+
+### 索引限制
+
+如果很少对集合进行读取操作，建议不使用索引。
+
+确保索引的大小不超过内存的限制。
+
+索引不能被以下的查询使用：
+
+- 正则表达式及非操作符，如 $nin, $not, 等。
+- 算术运算符，如 $mod, 等。
+- $where 子句
+
+最大范围：
+
+- 集合中索引不能超过64个
+- 索引名的长度不能超过128个字符
+- 一个复合索引最多可以有31个字段
+
+### ObjectId
+
+ObjectId 是一个12字节 BSON 类型数据，有以下格式：
+
+- 前4个字节表示时间戳
+- 接下来的3个字节是机器标识码
+- 紧接的两个字节由进程id组成（PID）
+- 最后三个字节是随机数。
+
+### Map Reduce
+
+将大量数据分块处理并合并。
+
+```
+>db.collection.mapReduce(
+   function() {emit(key,value);},  //map 函数
+   function(key,values) {return reduceFunction},   //reduce 函数
+   {
+      out: collection,
+      query: document,
+      sort: document,
+      limit: number
+   }
+)
+```
+
+- **map** ：映射函数 (生成键值对序列,作为 reduce 函数参数)。
+- **reduce** 统计函数，reduce函数的任务就是将key-values变成key-value，也就是把values数组变成一个单一的值value。。
+- **out** 统计结果存放集合 (不指定则使用临时集合,在客户端断开后自动删除)。
+- **query** 一个筛选条件，只有满足条件的文档才会调用map函数。（query。limit，sort可以随意组合）
+- **sort** 和limit结合的sort排序参数（也是在发往map函数前给文档排序），可以优化分组机制
+- **limit** 发往map函数的文档数量的上限（要是没有limit，单独使用sort的用处不大）
+
+输出结果：
+
+- result：储存结果的collection的名字，是个临时集合。
+- timeMillis：执行花费的时间
+- input：满足条件被发送到map函数的文档个数
+- emit：在map函数中emit被调用的次数，也就是所有集合中的数据总量
+- ouput：结果集合中的文档个数
+
+### 全文检索
+
+#### 启动全文检索
+
+```
+>db.adminCommand({setParameter:true,textSearchEnabled:true})
+```
+
+或者
+
+```
+mongod --setParameter textSearchEnabled=true
+```
+
+#### 创建全文索引
+
+```
+db.posts.ensureIndex({post_text:"text"})
+```
+
+#### 使用全文索引
+
+```
+db.posts.find({$text:{$search:"runoob"}})
+```
+
+#### 删除全文索引
+
+获得索引名：
+
+```
+db.posts.getIndexes()
+```
+
+删除：
+
+```
+db.posts.dropIndex("post_text_text")
+```
+
+### 正则表达式
+
+使用正则表达式查找包含 runoob 字符串的文章：
+
+```
+>db.posts.find({post_text:{$regex:"runoob"}})
+```
+
+或者
+
+```
+>db.posts.find({post_text:/runoob/})
+```
+
+不区分大小写：
+
+```
+>db.posts.find({post_text:{$regex:"runoob",$options:"$i"}})
+```
+
+也可以在数组字段中使用正则表达式来查找内容。
+
+正则表达式中使用变量时一定要使用eval将组合的字符串进行转换，不能直接将字符串拼接后传入给表达式：
+
+```
+var name=eval("/" + 变量值key +"/i"); 
+```
+
+### GridFS
+
+用于储存或者恢复超过16M的文件（BSON文件限制16M），会分块储存。
+
+#### 添加文件
+
+```
+>mongofiles.exe -d gridfs put song.mp3
+```
+
+**-d gridfs** 指定存储文件的数据库名称，如果不存在该数据库，MongoDB会自动创建。如果不存在该数据库，MongoDB会自动创建。
+
+#### 查看数据库中文件
+
+```
+>db.fs.files.find()
+```
+
+### 固定集合
+
+环形队列。
+
+#### 创建固定集合
+
+```
+>db.createCollection("cappedLogCollection",{capped:true,size:10000})
+```
+
+#### 判断是否为固定集合
+
+```
+>db.cappedLogCollection.isCapped()
+```
+
+#### 将已经存在的集合转换为固定集合
+
+```
+>db.runCommand({"convertToCapped":"posts",size:10000})
+```
+
+#### 特点
+
+可以插入及更新，但更新不能超出collection的大小，否则更新失败。不允许删除，但是可以调用drop()删除集合中的所有行，但是drop后需要显式地重建集合。
+
+- 对固定集合进行插入速度极快
+- 按照插入顺序的查询输出速度极快
+- 能够在插入最新数据时,淘汰最早的数据
+
+用法：1. 储存日志信息 2. 缓存一些少量的文档
+
+### 自动增长
+
+MongoDB没有自动增长的功能，但可以通过js控制update来实现_id的自动增长。
+
+# MongoDB学习结束！
