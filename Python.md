@@ -309,3 +309,230 @@ def f(a, b, /, c, d, *, e, f):
     print(a, b, c, d, e, f)
 ```
 
+### 数据结构
+
+#### 栈
+
+用列表实现，append()加元素，pop()出元素。
+
+#### 队列
+
+也可以用列表实现，但效率不高。
+
+#### 列表推导式
+
+通过已存在的列表并通过一定的规则生成新的列表。
+
+```python
+vec = [2, 4, 6]
+print([[x, x**2] for x in vec if x < 4])# [[2, 4]]
+```
+
+#### 同时读取字典的键值对
+
+```python
+knights = {'gallahad': 'the pure', 'robin': 'the brave'}
+for k, v in knights.items():
+	print(k, v)
+```
+
+#### 读取列表的值和索引
+
+```python
+for i, v in enumerate(['tic', 'tac', 'toe']):
+	print(i, v)
+```
+
+#### 同时遍历多个列表
+
+使用zip()：
+
+```python
+questions = ['name', 'quest', 'favorite color']
+answers = ['lancelot', 'the holy grail', 'blue']
+for q, a in zip(questions, answers):
+	print('What is your {0}?  It is {1}.'.format(q, a))
+```
+
+#### 反向遍历序列
+
+使用reversed(list)。
+
+### 模块
+
+引入模块：`import xxx`
+
+调用外部文件的函数：`外部文件名.函数名(参数)`
+
+导入模块的指定函数：`from 外部文件名 import 函数名`
+
+使用该函数：`函数名(参数)`
+
+导入所有模块只需写成*即可，可以在`__init__.py`中加入`__all__`变量用于控制可导入哪些模块。
+
+```python
+__all__ = ["echo", "surround", "reverse"]
+```
+
+#### `__name__`属性
+
+可用于判断是模块内部运行还是外部的调用。
+
+```python
+if __name__ == '__main__':
+   print('程序自身在运行')
+else:
+   print('我来自另一模块')
+```
+
+#### dir()
+
+可以找到模块内定义的所有名称。
+
+#### 包
+
+每个包内都需要`__init__.py`。
+
+导入包内的某个模块只需要一层层.即可。
+
+### 输出
+
+`rjust()`可以将字符串靠右, 并在左边填充空格。
+
+`format()`可以用于格式化字符串：
+
+```python
+print('{0} 和 {1}'.format('Google', 'Runoob'))# Google 和 Runoob
+print('{name}网址： {site}'.format(name='菜鸟教程', site='www.runoob.com'))# 菜鸟教程网址： www.runoob.com
+```
+
+### 读写文件
+
+```python
+open(filename, mode)
+```
+
+```python
+# 打开一个文件
+f = open("/tmp/foo.txt", "w")
+
+f.write( "Python 是一个非常好的语言。**\n**是的，的确非常好!!**\n**" )
+
+# 关闭打开的文件
+f.close()
+```
+
+`f.read()`读取文件内指定数量的内容。
+
+`f.readline()`从文件中读取单独的一行。
+
+`f.readlines()`读取文件中的所有行。
+
+`f.write()`写入文件，返回写入的字符数。
+
+`f.tell()`返回文件对象当前所处的位置。
+
+`f.seek()`改变文件当前的位置。
+
+- seek(x,0) ： 从起始位置即文件首行首字符开始移动 x 个字符
+- seek(x,1) ： 表示从当前位置往后移动x个字符
+- seek(-x,2)：表示从文件的结尾往前移动x个字符
+
+`f.close()`关闭文件。
+
+### 错误与异常
+
+异常捕捉：
+
+```python
+try:
+    ...
+except (a, b, c):# 在a或b或c异常发生时执行
+    ...
+except:# 在除了a，b，c三种异常发生异常时执行
+    ...
+else:# 无任何异常时执行
+    ...
+finally:# 什么时候都会执行
+    ...
+```
+
+抛出异常：
+
+```python
+raise [Exception [, args [, traceback]]]
+```
+
+抛出的必须是异常的类或者实例。
+
+### 面向对象
+
+#### 类
+
+```python
+class ClassName:
+    ...
+```
+
+类有一个名为`__init__()` 的特殊方法，该方法在类实例化时会自动调用。
+
+实例化：`x = ClassName()`
+
+类的内部定义方法时必须有参数self，且作为第一个参数，代表类的实例。
+
+#### 继承
+
+```python
+class ClassName(OldClassName):
+    ...
+```
+
+子类会继承父类的属性和方法。
+
+多继承时从左到右搜索方法名。
+
+#### 方法重写
+
+默认子类方法覆盖父类方法。
+
+`super()`可用于调用父类已被覆盖的方法。
+
+### 作用域
+
+搜索变量名称时会从局部作用域L->闭包函数外的函数E->全局作用域G->内建作用域B。
+
+### 全局变量与局部变量
+
+使用全局（最外层）变量：global
+
+```python
+num = 1
+def func ():
+    global num
+    return num# 1
+```
+
+使用外一层变量：nonlocal
+
+```python
+def func1 ():
+    num = 100
+    def func2 ():
+        nonlocal num
+        num = 1
+        return
+    print(num)# 1
+    return
+```
+
+### 标准库
+
+读取命令行参数：
+
+```python
+import sys
+print(sys.argv)
+```
+
+### 正则表达式
+
