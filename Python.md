@@ -536,3 +536,414 @@ print(sys.argv)
 
 ### 正则表达式
 
+```python
+re.match(pattern, string, flags=0)
+```
+
+从字符串的起始位置匹配模式，若起始位置匹配失败则返回none，匹配成功返回一个匹配的对象。
+
+可以用`group(num)`或者`groups()`匹配对象函数获取匹配表达式。
+
+```python
+re.search(pattern, string, flags=0)
+```
+
+扫描整个字符串并返回第一个成功的匹配，同match函数。
+
+```python
+re.sub(pattern, repl, string, count=0, flags=0)
+```
+
+- pattern : 正则中的模式字符串。
+- repl : 替换的字符串，也可为一个函数。
+- string : 要被查找替换的原始字符串。
+- count : 模式匹配后替换的最大次数，默认 0 表示替换所有的匹配。
+- flags : 编译时用的匹配模式，数字形式。
+
+用于替换字符串。
+
+```python
+re.compile(pattern[, flags])
+```
+
+编译正则表达式，生成一个正则表达式（ Pattern ）对象，供 match() 和 search() 这两个函数使用。
+
+```python
+re.findall(pattern, string, flags=0)
+或
+pattern.findall(string[, pos[, endpos]])
+```
+
+在字符串中找到正则表达式所匹配的所有子串，并返回一个列表，如果没有找到匹配的，则返回空列表。
+
+```python
+re.finditer(pattern, string, flags=0)
+```
+
+在字符串中找到正则表达式所匹配的所有子串，并把它们作为一个迭代器返回。
+
+```python
+re.split(pattern, string[, maxsplit=0, flags=0])
+```
+
+按照能够匹配的子串将字符串分割后返回列表。
+
+### MySQL-mysql-connector
+
+安装：`python -m pip install mysql-connector`
+
+导入：`import mysql.connector`
+
+连接数据库：
+
+```python
+mydb = mysql.connector.connect(
+  host="localhost",       # 数据库主机地址
+  user="yourusername",    # 数据库用户名
+  passwd="yourpassword"   # 数据库密码
+  database="runoob_db"    # 数据库名称（可选）
+)
+ 
+print(mydb)
+```
+
+创建数据库：
+
+```python
+mycursor = mydb.cursor()
+mycursor.execute("CREATE DATABASE runoob_db")
+```
+
+创建数据表：
+
+```python
+mycursor = mydb.cursor()
+mycursor.execute("CREATE TABLE sites (name VARCHAR(255), url VARCHAR(255))")
+```
+
+插入数据：
+
+```python
+mycursor = mydb.cursor()
+ 
+sql = "INSERT INTO sites (name, url) VALUES (%s, %s)"
+val = ("RUNOOB", "https://www.runoob.com")
+mycursor.execute(sql, val)
+ 
+mydb.commit()    # 数据表内容有更新，必须使用到该语句
+ 
+print(mycursor.rowcount, "记录插入成功。")
+```
+
+批量插入：
+
+```python
+mycursor = mydb.cursor()
+ 
+sql = "INSERT INTO sites (name, url) VALUES (%s, %s)"
+val = [
+  ('Google', 'https://www.google.com'),
+  ('Github', 'https://www.github.com'),
+  ('Taobao', 'https://www.taobao.com'),
+  ('stackoverflow', 'https://www.stackoverflow.com/')
+]
+ 
+mycursor.executemany(sql, val)
+ 
+mydb.commit()    # 数据表内容有更新，必须使用到该语句
+ 
+print(mycursor.rowcount, "记录插入成功。")
+```
+
+查询数据：
+
+```python
+mycursor = mydb.cursor()
+ 
+mycursor.execute("SELECT * FROM sites")
+ 
+myresult = mycursor.fetchall()     # fetchall() 获取所有记录
+```
+
+其余操作均参照MySQL原生内容即可。
+
+### MySQL-PyMySQL
+
+安装：`$ pip3 install PyMySQL`
+
+连接：
+
+```python
+import pymysql
+ 
+# 打开数据库连接
+db = pymysql.connect("localhost","testuser","test123","TESTDB" )
+ 
+# 使用 cursor() 方法创建一个游标对象 cursor
+cursor = db.cursor()
+```
+
+操作：
+
+```python
+try:
+   # 执行SQL语句
+   cursor.execute(sql)
+   # 提交到数据库执行
+   db.commit()
+except:
+   # 发生错误时回滚
+   db.rollback()
+ 
+# 关闭数据库连接
+db.close()
+```
+
+- **fetchone():** 该方法获取下一个查询结果集。结果集是一个对象
+- **fetchall():** 接收全部的返回结果行.
+- **rowcount:** 这是一个只读属性，并返回执行execute()方法后影响的行数。
+
+### Socket
+
+```python
+socket.socket([family[, type[, proto]]])
+```
+
+创建socket。
+
+### SMTP发送邮件
+
+引入：
+
+```python
+import smtplib
+smtpObj = smtplib.SMTP( [host [, port [, local_hostname]]] )
+```
+
+发送邮件：
+
+```python
+SMTP.sendmail(from_addr, to_addrs, msg[, mail_options, rcpt_options]
+```
+
+注意此处的msg需要遵循SMTP协议。
+
+### 多线程
+
+创建新线程：
+
+```python
+_thread.start_new_thread ( function, args[, kwargs] )
+```
+
+可以通过直接从 threading.Thread 继承创建一个新的子类，并实例化后调用 start() 方法启动新线程，即它调用了线程的 run() 方法。
+
+线程同步：使用锁来控制线程的运行。
+
+线程优先级队列：使用队列控制不同线程。
+
+### XML解析
+
+使用xml.dom解析xml。
+
+```python
+from xml.dom.minidom import parse
+import xml.dom.minidom
+
+# 使用minidom解析器打开 XML 文档
+DOMTree = xml.dom.minidom.parse("movies.xml")
+collection = DOMTree.documentElement
+```
+
+之后就可以`collection.getElementByTagName()`等等。
+
+### JSON解析
+
+引入：`import json`
+
+字典转JSON：`json = json.dumps(data)`
+
+JSON转字典：`dict = json.loads(json)`
+
+### MongoDB
+
+安装：`$ python3 -m pip3 install pymongo`
+
+更新：`$ python3 -m pip3 install --upgrade pymongo`
+
+连接数据库runoobdb：
+
+```python
+import pymongo
+
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["runoobdb"]
+```
+
+创建表：
+
+```python
+mycol = mydb["sites"]
+```
+
+插入单个文档：
+
+```python
+mydict = { "name": "RUNOOB", "alexa": "10000", "url": "https://www.runoob.com" }
+x = mycol.insert_one(mydict) 
+```
+
+插入多个文档：
+
+```python
+mylist = [
+  { "name": "Taobao", "alexa": "100", "url": "https://www.taobao.com" },
+  { "name": "QQ", "alexa": "101", "url": "https://www.qq.com" },
+  { "name": "Facebook", "alexa": "10", "url": "https://www.facebook.com" },
+  { "name": "知乎", "alexa": "103", "url": "https://www.zhihu.com" },
+  { "name": "Github", "alexa": "109", "url": "https://www.github.com" }
+]
+ 
+x = mycol.insert_many(mylist)
+```
+
+查询单个数据：
+
+```python
+x = mycol.find_one()
+```
+
+查询所有数据：
+
+```python
+for x in mycol.find():
+  print(x)
+```
+
+查询指定条件的数据：
+
+```python
+for x in mycol.find({},{ "_id": 0, "name": 1, "alexa": 1 }):
+  print(x)
+```
+
+0表示不要返回，1表示要返回。
+
+修改数据：
+
+```python
+myquery = { "name": { "$regex": "^F" } }
+newvalues = { "$set": { "alexa": "123" } }
+ 
+x = mycol.update_many(myquery, newvalues)
+```
+
+排序：
+
+```python
+mydoc = mycol.find().sort("alexa", -1)
+```
+
+删除数据：
+
+```python
+myquery = { "name": "Taobao" }
+mycol.delete_one(myquery)
+```
+
+其余操作均跟原生MongoDB相似。
+
+### urllib
+
+#### urllib.request
+
+用于模拟浏览器的请求。
+
+```python
+urllib.request.urlopen(url, data=None, [timeout, ]*, cafile=None, capath=None, context=None)
+```
+
+- **url**：url 地址。
+- **data**：发送到服务器的其他数据对象，默认为 None。
+- **timeout**：设置访问超时时间。
+- **cafile 和 capath**：cafile 为 CA 证书， capath 为 CA 证书的路径，使用 HTTPS 需要用到。
+- **context**：ssl.SSLContext类型，用来指定 SSL 设置。
+
+读取内容后用`read()`获取html代码。
+
+用`getcode()`获取状态码：
+
+```python
+except urllib.error.HTTPError as e:
+    if e.code == 404:
+        print(404)   # 404
+```
+
+模拟头部信息：
+
+```python
+class urllib.request.Request(url, data=None, headers={}, origin_req_host=None, unverifiable=False, method=None)
+```
+
+- **url**：url 地址。
+- **data**：发送到服务器的其他数据对象，默认为 None。
+- **headers**：HTTP 请求的头部信息，字典格式。
+- **origin_req_host**：请求的主机地址，IP 或域名。
+- **unverifiable**：很少用整个参数，用于设置网页是否需要验证，默认是False。。
+- **method**：请求方法， 如 GET、POST、DELETE、PUT等。
+
+完整的请求过程：
+
+```python
+url_all = url+key_code
+header = {
+    'User-Agent':'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+}   #头部信息
+request = urllib.request.Request(url_all,headers=header)
+reponse = urllib.request.urlopen(request).read()
+```
+
+POST请求加上data：
+
+```python
+url = 'https://www.runoob.com/try/py3/py3_urllib_test.php'  # 提交到表单页面
+data = {'name':'RUNOOB', 'tag' : '菜鸟教程'}   # 提交数据
+header = {
+    'User-Agent':'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+}   #头部信息
+data = urllib.parse.urlencode(data).encode('utf8')  # 对参数进行编码，解码使用 urllib.parse.urldecode
+request=urllib.request.Request(url, data, header)   # 请求处理
+reponse=urllib.request.urlopen(request).read()      # 读取结果
+```
+
+#### urllib.parse
+
+```python
+urllib.parse.urlparse(urlstring, scheme='', allow_fragments=True)
+```
+
+用于解析url。
+
+### urllib.robotparser
+
+用于解析robots.txt。
+
+```python
+import urllib.robotparser
+rp = urllib.robotparser.RobotFileParser()
+rp.set_url("http://www.musi-cal.com/robots.txt")
+rp.read()
+rp.request_rate("*").requests # 3
+```
+
+### Python Web
+
+安装uWSGI：`pip install uwsgi`
+
+Django等等框架之后再说。
+
+### pip
+
+python的npm。
+
+# Python基础部分学习结束！
